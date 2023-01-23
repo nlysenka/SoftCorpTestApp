@@ -7,18 +7,18 @@ namespace SoftCorpTestApp.Api.Controllers
     [ApiController]
     public class MainController : ControllerBase
     {
-        private readonly ICoingeckoIntegration coingeckoIntegrationService;
+        private readonly ICoingeckoIntegration _coingeckoIntegrationService;
         public MainController(ICoingeckoIntegration coingeckoIntegrationService)
         {
-            this.coingeckoIntegrationService = coingeckoIntegrationService;
+            _coingeckoIntegrationService = coingeckoIntegrationService;
         }
 
         [HttpGet("trending")]
-        public async Task<int> GetTreding()
+        public async Task<string> GetTreding()
         {
-            var trending = await coingeckoIntegrationService.GetTrendingAsync();
+            var trending = await _coingeckoIntegrationService.GetTrendingAsync();
 
-            return 888;
+            return trending;
         }
     }
 }
