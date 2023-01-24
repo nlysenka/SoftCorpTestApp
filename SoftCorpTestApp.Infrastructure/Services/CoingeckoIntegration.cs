@@ -7,12 +7,12 @@ using SoftCorpTestApp.Core.Interfaces.Infrastructure;
 
 namespace SoftCorpTestApp.Infrastructure.Services
 {
-    public class CoingeckoIntegration : ICoingeckoIntegration
+    public class CoinGeckoIntegration : ICoinGeckoIntegration
     {
         private readonly HttpClient _httpClient;
-        private readonly CoingeckoConfiguration _configuration;
+        private readonly CoinGeckoConfiguration _configuration;
 
-        public CoingeckoIntegration(HttpClient httpClient, CoingeckoConfiguration configuration)
+        public CoinGeckoIntegration(HttpClient httpClient, CoinGeckoConfiguration configuration)
         {
             _httpClient = httpClient;
             _configuration = configuration;
@@ -23,21 +23,24 @@ namespace SoftCorpTestApp.Infrastructure.Services
             var response = await _httpClient.GetAsync($"{_configuration.BaseUrl}/coins/list");
 
             response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = await response.Content.ReadAsStringAsync();
 
             var coins = JsonConvert.DeserializeObject<List<Coin>>(responseBody);
 
             return coins!;
         }
 
-        public async Task<Dictionary<string, BaseCurrencies>> GetPricesAsync(List<string> listOfCoins)
+        public async Task<Dictionary<string, Dictionary<string, decimal>>> GetPricesAsync(List<string> listOfCoins,
+            List<string> listOfCurrencies)
         {
             var coinsParam = string.Join(",", listOfCoins);
+            var currenciesParam = string.Join(",", listOfCurrencies);
+
 
             var queryParameters = new Dictionary<string, string>
             {
                 { "ids", coinsParam },
-                { "vs_currencies", "usd,eur,rub"}
+                { "vs_currencies", currenciesParam}
             };
 
             var dictFormUrlEncoded = new FormUrlEncodedContent(queryParameters);
@@ -50,9 +53,21 @@ namespace SoftCorpTestApp.Infrastructure.Services
            
             var jObject = JObject.Parse(responseBody);
            
-            var values = jObject.ToObject<Dictionary<string, BaseCurrencies>>();
+            var values = jObject.ToObject<Dictionary<string, Dictionary<string,decimal>>>();
            
             return values!;
+        }
+
+        public async Task<List<string>> GetSupportedCurrencies()
+        {
+            var response = await _httpClient.GetAsync($"{_configuration.BaseUrl}/simple/supported_vs_currencies");
+
+            response.EnsureSuccessStatusCode();
+            var responseBody = await response.Content.ReadAsStringAsync();
+
+            var coins = JsonConvert.DeserializeObject<List<string>>(responseBody);
+
+            return coins!;
         }
     }
 }

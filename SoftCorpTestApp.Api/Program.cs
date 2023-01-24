@@ -10,11 +10,12 @@ builder.Services.AddHostedService<MonitorWorker>();
 
 builder.Services.AddHttpClient();
 
-builder.Services.AddSingleton(builder.Configuration.GetSection(nameof(CoingeckoConfiguration)).Get<CoingeckoConfiguration>());
+builder.Services.AddSingleton(builder.Configuration.GetSection(nameof(CoinGeckoConfiguration)).Get<CoinGeckoConfiguration>());
 
-
-builder.Services.AddSingleton<ICoingeckoIntegration, CoingeckoIntegration>();
+builder.Services.AddSingleton<ICoinGeckoIntegration, CoinGeckoIntegration>();
 builder.Services.AddSingleton<IWorkerControl, WorkerControl>();
+
+builder.Services.AddScoped<IConverterService, ConverterService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
