@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SoftCorpTestApp.Core.Interfaces.Infrastructure;
+using SoftCorpTestApp.Core.DTO;
+using SoftCorpTestApp.Core.Interfaces.Services;
 
 namespace SoftCorpTestApp.Api.Controllers
 {
@@ -7,18 +8,17 @@ namespace SoftCorpTestApp.Api.Controllers
     [ApiController]
     public class MainController : ControllerBase
     {
-        private readonly ICoingeckoIntegration _coingeckoIntegrationService;
-        public MainController(ICoingeckoIntegration coingeckoIntegrationService)
+        private readonly IWorkerControl _workerControl;
+        public MainController(IWorkerControl workerControl)
         {
-            _coingeckoIntegrationService = coingeckoIntegrationService;
+            _workerControl = workerControl;
         }
 
-        [HttpGet("trending")]
-        public async Task<string> GetTreding()
+        [HttpGet("coins")]
+        public Dictionary<string, BaseCurrencies> GetCoins()
         {
-            var trending = await _coingeckoIntegrationService.GetTrendingAsync();
-
-            return trending;
+            var result = _workerControl.GetCryptoCurrencyPrices();
+            return result;
         }
     }
 }

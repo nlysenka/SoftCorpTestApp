@@ -1,5 +1,6 @@
 using SoftCorpTestApp.Core.Configuration;
 using SoftCorpTestApp.Core.Interfaces.Infrastructure;
+using SoftCorpTestApp.Core.Interfaces.Services;
 using SoftCorpTestApp.Core.Services;
 using SoftCorpTestApp.Infrastructure.Services;
 
@@ -11,7 +12,9 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddSingleton(builder.Configuration.GetSection(nameof(CoingeckoConfiguration)).Get<CoingeckoConfiguration>());
 
-builder.Services.AddScoped<ICoingeckoIntegration, CoingeckoIntegration>();
+
+builder.Services.AddSingleton<ICoingeckoIntegration, CoingeckoIntegration>();
+builder.Services.AddSingleton<IWorkerControl, WorkerControl>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
