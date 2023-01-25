@@ -12,7 +12,7 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddSingleton(builder.Configuration.GetSection(nameof(CoinGeckoConfiguration)).Get<CoinGeckoConfiguration>());
 
-builder.Services.AddSingleton<ICoinGeckoIntegration, CoinGeckoIntegration>();
+builder.Services.AddScoped<ICoinGeckoIntegration, CoinGeckoIntegration>();
 builder.Services.AddSingleton<IWorkerControl, WorkerControl>();
 
 builder.Services.AddControllers();

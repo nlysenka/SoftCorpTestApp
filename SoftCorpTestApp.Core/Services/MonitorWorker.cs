@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using SoftCorpTestApp.Core.Configuration;
 using SoftCorpTestApp.Core.Interfaces.Infrastructure;
 using SoftCorpTestApp.Core.Interfaces.Services;
@@ -7,15 +8,16 @@ namespace SoftCorpTestApp.Core.Services
 {
     public class MonitorWorker : BackgroundService
     {
-        private readonly ICoinGeckoIntegration _coinGeckoIntegration;
         private readonly IWorkerControl _workerControl;
         private readonly CoinGeckoConfiguration _coinGeckoConfiguration;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
 
-        public MonitorWorker(ICoinGeckoIntegration coinGeckoIntegration, IWorkerControl workerControl, CoinGeckoConfiguration coinGeckoConfiguration)
+        public MonitorWorker(IWorkerControl workerControl,
+            CoinGeckoConfiguration coinGeckoConfiguration, IServiceScopeFactory serviceScopeFactory)
         {
-            _coinGeckoIntegration = coinGeckoIntegration;
             _workerControl = workerControl;
             _coinGeckoConfiguration = coinGeckoConfiguration;
+            _serviceScopeFactory = serviceScopeFactory;
             Console.WriteLine("MonitorWorker is initialized.");
         }
 
@@ -23,13 +25,17 @@ namespace SoftCorpTestApp.Core.Services
         {
             while (!stoppingToken.IsCancellationRequested)
             {
+                using var scope = _serviceScopeFactory.CreateScope();
+                var coinGeckoIntegration = scope.ServiceProvider.GetService<ICoinGeckoIntegration>();
+
                 Console.WriteLine($"Worker running at: {DateTimeOffset.Now}");
 
-                var coins = await _coinGeckoIntegration.GetCoinsAsync();
+                var coins = await coinGeckoIntegration?.GetCoinsAsync()!;
 
-                var prices = await _coinGeckoIntegration.GetPricesAsync(coins.Take(100).Select(p => p.Id).ToList(), _coinGeckoConfiguration.BaseCurrencies);
+                var prices = 
+                    await coinGeckoIntegration.GetPricesAsync(coins.Take(100).Select(p => p.Id).ToList(), _coinGeckoConfiguration.BaseCurrencies);
 
-                var exchangeRates = await _coinGeckoIntegration.GetExchangeRatesAsync();
+                var exchangeRates = await coinGeckoIntegration.GetExchangeRatesAsync();
 
                 _workerControl.SetCryptoCurrencyPrices(prices);
                 _workerControl.SetExchangeRates(exchangeRates);

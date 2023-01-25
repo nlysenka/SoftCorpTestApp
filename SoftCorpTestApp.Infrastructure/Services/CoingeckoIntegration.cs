@@ -9,17 +9,16 @@ namespace SoftCorpTestApp.Infrastructure.Services
     public class CoinGeckoIntegration : ICoinGeckoIntegration
     {
         private readonly HttpClient _httpClient;
-        private readonly CoinGeckoConfiguration _configuration;
 
-        public CoinGeckoIntegration(HttpClient httpClient, CoinGeckoConfiguration configuration)
+        public CoinGeckoIntegration(IHttpClientFactory httpClientFactory, CoinGeckoConfiguration configuration)
         {
-            _httpClient = httpClient;
-            _configuration = configuration;
+            _httpClient = httpClientFactory.CreateClient();
+            _httpClient.BaseAddress = new Uri(configuration.BaseUrl);
         }
 
         public async Task<List<Coin>> GetCoinsAsync()
         {
-            var response = await _httpClient.GetAsync($"{_configuration.BaseUrl}/coins/list");
+            var response = await _httpClient.GetAsync("coins/list");
 
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
@@ -29,12 +28,10 @@ namespace SoftCorpTestApp.Infrastructure.Services
             return coins!;
         }
 
-        public async Task<Dictionary<string, Dictionary<string, decimal>>> GetPricesAsync(List<string> listOfCoins,
-            List<string> listOfCurrencies)
+        public async Task<Dictionary<string, Dictionary<string, decimal>>> GetPricesAsync(List<string> listOfCoins, List<string> listOfCurrencies)
         {
             var coinsParam = string.Join(",", listOfCoins);
             var currenciesParam = string.Join(",", listOfCurrencies);
-
 
             var queryParameters = new Dictionary<string, string>
             {
@@ -45,7 +42,7 @@ namespace SoftCorpTestApp.Infrastructure.Services
             var dictFormUrlEncoded = new FormUrlEncodedContent(queryParameters);
             var queryString = await dictFormUrlEncoded.ReadAsStringAsync();
 
-            var response = await _httpClient.GetAsync($"{_configuration.BaseUrl}/simple/price?{queryString}");
+            var response = await _httpClient.GetAsync($"simple/price?{queryString}");
 
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync();
@@ -59,7 +56,7 @@ namespace SoftCorpTestApp.Infrastructure.Services
 
         public async Task<List<ExchangeRate>> GetExchangeRatesAsync()
         {
-            var response = await _httpClient.GetAsync($"{_configuration.BaseUrl}/exchange_rates");
+            var response = await _httpClient.GetAsync("exchange_rates");
 
             response.EnsureSuccessStatusCode();
             
