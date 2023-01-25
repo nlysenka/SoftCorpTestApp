@@ -1,20 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using SoftCorpTestApp.Core.DTO;
 using SoftCorpTestApp.Core.Interfaces.Services;
 
 namespace SoftCorpTestApp.Api.Controllers
 {
-    [Route("api/main")]
+	[Route("api/main")]
     [ApiController]
     public class MainController : ControllerBase
     {
         private readonly IWorkerControl _workerControl;
-        private readonly IConverterService _converterService;
 
-        public MainController(IWorkerControl workerControl, IConverterService converterService)
+        public MainController(IWorkerControl workerControl)
         {
             _workerControl = workerControl;
-            _converterService = converterService;
         }
 
         [HttpGet("coins")]
@@ -25,13 +22,13 @@ namespace SoftCorpTestApp.Api.Controllers
         }
 
         [HttpGet("convert")]
-        public async Task<decimal> ConvertCoinToCurrency(
+        public decimal ConvertCoinToCurrency(
             [FromHeader] decimal sum,
             [FromHeader] string coin,
             [FromHeader] string currency
         )
         {
-            var result = await _converterService.ConvertCoinToCurrency(sum, coin, currency);
+            var result = _workerControl.GetConvertedValue(sum, coin, currency);
             return result;
         }
     }

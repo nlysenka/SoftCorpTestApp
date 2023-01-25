@@ -15,8 +15,6 @@ builder.Services.AddSingleton(builder.Configuration.GetSection(nameof(CoinGeckoC
 builder.Services.AddSingleton<ICoinGeckoIntegration, CoinGeckoIntegration>();
 builder.Services.AddSingleton<IWorkerControl, WorkerControl>();
 
-builder.Services.AddScoped<IConverterService, ConverterService>();
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

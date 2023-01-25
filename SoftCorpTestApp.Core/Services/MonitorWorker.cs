@@ -5,10 +5,6 @@ using SoftCorpTestApp.Core.Interfaces.Services;
 
 namespace SoftCorpTestApp.Core.Services
 {
-    public interface IMonitorWorker
-    {
-        void TestMethod();
-    }
     public class MonitorWorker : BackgroundService
     {
         private readonly ICoinGeckoIntegration _coinGeckoIntegration;
@@ -20,7 +16,7 @@ namespace SoftCorpTestApp.Core.Services
             _coinGeckoIntegration = coinGeckoIntegration;
             _workerControl = workerControl;
             _coinGeckoConfiguration = coinGeckoConfiguration;
-            Console.WriteLine("MonitorWorker is initialized!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            Console.WriteLine("MonitorWorker is initialized.");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -33,15 +29,13 @@ namespace SoftCorpTestApp.Core.Services
 
                 var prices = await _coinGeckoIntegration.GetPricesAsync(coins.Take(100).Select(p => p.Id).ToList(), _coinGeckoConfiguration.BaseCurrencies);
 
+                var exchangeRates = await _coinGeckoIntegration.GetExchangeRatesAsync();
+
                 _workerControl.SetCryptoCurrencyPrices(prices);
+                _workerControl.SetExchangeRates(exchangeRates);
 
                 await Task.Delay(30000, stoppingToken);
             }
-        }
-
-        public void TestMethod()
-        {
-            Console.WriteLine("1");
         }
     }
 }

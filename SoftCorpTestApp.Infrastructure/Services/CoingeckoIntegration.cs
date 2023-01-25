@@ -1,5 +1,4 @@
-﻿
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SoftCorpTestApp.Core.Configuration;
 using SoftCorpTestApp.Core.DTO;
@@ -58,16 +57,19 @@ namespace SoftCorpTestApp.Infrastructure.Services
             return values!;
         }
 
-        public async Task<List<string>> GetSupportedCurrencies()
+        public async Task<List<ExchangeRate>> GetExchangeRatesAsync()
         {
-            var response = await _httpClient.GetAsync($"{_configuration.BaseUrl}/simple/supported_vs_currencies");
+            var response = await _httpClient.GetAsync($"{_configuration.BaseUrl}/exchange_rates");
 
             response.EnsureSuccessStatusCode();
+            
             var responseBody = await response.Content.ReadAsStringAsync();
 
-            var coins = JsonConvert.DeserializeObject<List<string>>(responseBody);
+            var resultWrapper = JsonConvert.DeserializeObject<Dictionary<string,Dictionary<string, CoinValue>>>(responseBody)!.FirstOrDefault();
 
-            return coins!;
+            var result = resultWrapper.Value.ToList().Select(keyValuePair => new ExchangeRate {NameCurrency = keyValuePair.Key, Value = keyValuePair.Value.Value}).ToList();
+
+            return result;
         }
     }
 }

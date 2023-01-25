@@ -8,6 +8,6 @@ namespace SoftCorpTestApp.Core.Interfaces.Infrastructure
 
         Task<Dictionary<string, Dictionary<string, decimal>>> GetPricesAsync(List<string> listOfCoins, List<string> listOfCurrencies);
 
-        Task<List<string>> GetSupportedCurrencies();
+        Task<List<ExchangeRate>> GetExchangeRatesAsync();
     }
 }
