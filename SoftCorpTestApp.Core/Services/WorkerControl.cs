@@ -1,5 +1,9 @@
-﻿using SoftCorpTestApp.Core.DTO;
+﻿using System;
+using System.Net;
+using SoftCorpTestApp.Core.DTO;
+using SoftCorpTestApp.Core.Exceptions;
 using SoftCorpTestApp.Core.Interfaces.Services;
+using static SoftCorpTestApp.Core.Exceptions.SoftCorpExceptionResponse;
 
 namespace SoftCorpTestApp.Core.Services
 {
@@ -33,7 +37,7 @@ namespace SoftCorpTestApp.Core.Services
 
             if (currencyValue == null || coinValue == null)
             {
-                throw new Exception($"The coin '{coin}' or currency '{currency}' is not supported for conversion.");
+                throw new SoftCorpException(HttpStatusCode.BadRequest, $"The coin '{coin}' or currency '{currency}' is not supported for conversion."); 
             }
 
             var result = currencyValue.Value / coinValue.Value * sum;

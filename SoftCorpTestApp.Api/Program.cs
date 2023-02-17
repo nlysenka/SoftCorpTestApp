@@ -26,7 +26,7 @@ builder.Services.AddSwaggerGen(options =>
     {
         Version = "v1",
         Title = "Simple monitor of cryptocurrency exchange rates",
-        Description = "An ASP.NET Core Web API for managing ToDo items"
+        Description = "An test project"
 
     });
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -35,12 +35,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-app.UseExceptionHandler(c => c.Run(async context =>
-{
-    var exception = context.Features.Get<IExceptionHandlerPathFeature>()?.Error;
-    var response = new { error = exception?.Message};
-    await context.Response.WriteAsJsonAsync(response);
-}));
+app.UseExceptionHandler("/exception");
 
 app.UseSwagger();
 app.UseSwaggerUI();
