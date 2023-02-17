@@ -13,10 +13,10 @@ namespace SoftCorpTestApp.Core.Services
             return _cryptoCurrencyPrices;
         }
 
-        public void SetCryptoCurrencyPrices(Dictionary<string, Dictionary<string, decimal>> result)
+        public void SetCryptoCurrencyPrices(Dictionary<string, Dictionary<string, decimal>> cryptoCurrencyPrices)
         {
             _cryptoCurrencyPrices.Clear();
-            _cryptoCurrencyPrices = result;
+            _cryptoCurrencyPrices = cryptoCurrencyPrices;
         }
 
         public void SetExchangeRates(List<ExchangeRate> exchangeRates)
@@ -27,10 +27,16 @@ namespace SoftCorpTestApp.Core.Services
 
         public decimal GetConvertedValue(decimal sum, string coin, string currency)
         {
-            var currencyValue = _exchangeRates.FirstOrDefault(p => p.NameCurrency == currency)!.Value;
-            var coinValue = _exchangeRates.FirstOrDefault(p => p.NameCurrency == coin)!.Value;
+            
+            var currencyValue = _exchangeRates.FirstOrDefault(p => p.NameCurrency == currency)!;
+            var coinValue = _exchangeRates.FirstOrDefault(p => p.NameCurrency == coin);
 
-            var result = currencyValue / coinValue * sum;
+            if (currencyValue == null || coinValue == null)
+            {
+                throw new Exception($"The coin '{coin}' or currency '{currency}' is not supported for conversion.");
+            }
+
+            var result = currencyValue.Value / coinValue.Value * sum;
             return result;
         }
     }

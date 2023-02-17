@@ -21,11 +21,14 @@ namespace SoftCorpTestApp.Api.Controllers
             return result;
         }
 
+        /// <summary>
+        /// Supported coin/currrencies in readme file.
+        /// </summary>
         [HttpGet("convert")]
         public decimal ConvertCoinToCurrency(
-            [FromHeader] decimal sum,
-            [FromHeader] string coin,
-            [FromHeader] string currency
+            [FromHeader] decimal sum = 1,
+            [FromHeader] string coin = "usd",
+            [FromHeader] string currency = "btc"
         )
         {
             var result = _workerControl.GetConvertedValue(sum, coin, currency);

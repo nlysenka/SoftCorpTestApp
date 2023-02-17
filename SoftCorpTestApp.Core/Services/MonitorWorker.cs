@@ -18,7 +18,6 @@ namespace SoftCorpTestApp.Core.Services
             _workerControl = workerControl;
             _coinGeckoConfiguration = coinGeckoConfiguration;
             _serviceScopeFactory = serviceScopeFactory;
-            Console.WriteLine("MonitorWorker is initialized.");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -27,8 +26,6 @@ namespace SoftCorpTestApp.Core.Services
             {
                 using var scope = _serviceScopeFactory.CreateScope();
                 var coinGeckoIntegration = scope.ServiceProvider.GetService<ICoinGeckoIntegration>();
-
-                Console.WriteLine($"Worker running at: {DateTimeOffset.Now}");
 
                 var coins = await coinGeckoIntegration?.GetCoinsAsync()!;
 
